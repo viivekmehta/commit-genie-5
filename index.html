@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spokes AI Agents | Knowledge26 Lab</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Outfit',sans-serif;background:#061525;color:#e8f4f8;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+    .header-img,.footer-img{width:100%;display:block;flex-shrink:0}
+    .qz-card{background:rgba(10,31,51,0.85);border:1px solid rgba(98,216,78,0.15);border-radius:12px;padding:32px 24px;max-width:420px;width:100%;box-shadow:none}
+    .qz-q{font-size:1.2rem;font-weight:600;margin-bottom:18px;color:#e8f4f8}
+    .qz-opt{display:block;width:100%;background:rgba(6,21,37,0.8);border:1px solid rgba(98,216,78,0.2);color:#e8f4f8;border-radius:8px;padding:12px 0;margin-bottom:12px;font-size:1rem;cursor:pointer;transition:background .1s}
+    .qz-opt.selected{background:#00c7b1;color:#061525;border-color:#62d84e}
+    .qz-opt.correct{background:#62d84e;color:#061525;border-color:#62d84e}
+    .qz-opt.incorrect{background:#e74c3c;color:#fff;border-color:#e74c3c}
+    .qz-feedback{margin:10px 0 0 0;font-size:1rem;font-weight:500;min-height:24px}
+    .qz-btn{background:linear-gradient(135deg,#62d84e,#00c7b1);color:#061525;font-weight:700;border:none;border-radius:10px;padding:12px 24px;cursor:pointer;font-size:1rem;margin-top:18px;box-shadow:0 0 20px rgba(98,216,78,0.25);transition:transform .1s}
+    .qz-btn:active{transform:translateY(2px)}
+    .qz-score{font-size:1.3rem;font-weight:700;margin-bottom:12px;color:#62d84e}
+    .qz-status{font-size:.98rem;color:#7a9bb5;margin-bottom:18px}
+    @media(max-width:600px){.qz-card{padding:18px 6px}}
+  </style>
+</head>
+<body>
+  <img src="https://raw.githubusercontent.com/testmail-ihub/spokes-ai-assets/main/header-banner.jpg" class="header-img" alt="Header" style="min-height:140px; background:#061525;" />
+  <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:40px 20px;">
+    <div class="qz-card" id="quizCard">
+      <div id="quizContent"></div>
+    </div>
+  </div>
+  <img src="https://raw.githubusercontent.com/testmail-ihub/spokes-ai-assets/main/footer-banner.jpg" class="footer-img" alt="Footer" style="min-height:28px; background:#0a1f33;" />
+  <script>
+const quiz=[
+  {q:"Which ServiceNow release introduced Flow Designer?",opts:["Istanbul","London","Kingston","Madrid"],a:1},
+  {q:"What is the codename for the ServiceNow 'Rome' release?",opts:["Q2 2021","Q3 2021","Q4 2021","Q1 2022"],a:1},
+  {q:"Which feature was first available in the 'Orlando' release?",opts:["Mobile Agent App","Virtual Agent","Predictive Intelligence","IntegrationHub"],a:0},
+  {q:"Which release added the Now Experience UI Framework?",opts:["Paris","Quebec","Rome","San Diego"],a:1},
+  {q:"What is the main focus of the 'San Diego' release?",opts:["Next Experience UI","Flow Designer","Performance Analytics","Service Portal"],a:0}
+];
+let idx=0,score=0,answered=false;
+const quizContent=document.getElementById('quizContent');
+function renderQ(){
+  const q=quiz[idx];
+  let html=`<div class='qz-status'>Question ${idx+1} of ${quiz.length}</div><div class='qz-q'>${q.q}</div>`;
+  q.opts.forEach((opt,i)=>{
+    html+=`<button class='qz-opt' id='opt${i}' onclick='selectOpt(${i})'>${opt}</button>`;
+  });
+  html+=`<div class='qz-feedback' id='feedback'></div>`;
+  quizContent.innerHTML=html;
+  answered=false;
+}
+window.selectOpt=function(i){
+  if(answered)return;
+  answered=true;
+  const q=quiz[idx];
+  const btns=[...document.getElementsByClassName('qz-opt')];
+  btns.forEach((b,j)=>{
+    b.classList.remove('selected','correct','incorrect');
+    if(j===i)b.classList.add('selected');
+  });
+  setTimeout(()=>{
+    btns.forEach((b,j)=>{
+      b.disabled=true;
+      if(j===q.a)b.classList.add('correct');
+      else if(j===i)b.classList.add('incorrect');
+    });
+    document.getElementById('feedback').textContent=i===q.a?'Correct! 🎉':'Incorrect.';
+    if(i===q.a)score++;
+    setTimeout(()=>{
+      idx++;
+      if(idx<quiz.length)renderQ();
+      else showScore();
+    },900);
+  },120);
+}
+function showScore(){
+  quizContent.innerHTML=`<div class='qz-score'>Your Score: ${score} / ${quiz.length}</div><div class='qz-feedback'>${score===quiz.length?'Perfect! 🌟':'Great job!'}</div><button class='qz-btn' onclick='restartQuiz()'>Restart Quiz</button>`;
+}
+window.restartQuiz=function(){idx=0;score=0;renderQ();}
+renderQ();
+  </script>
+</body>
+</html>
